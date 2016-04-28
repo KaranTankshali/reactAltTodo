@@ -1,0 +1,19 @@
+.table{
+	margin-bottom: 10px;
+	width:50%;
+	overflow:hidden;
+	text-align:center;
+	margin-top:10px;
+}
+
+th{
+	text-align:center;
+}
+
+button {
+	margin-left:10px;
+}
+
+.todo {
+	margin:10px;
+}
