@@ -17,3 +17,7 @@ button {
 .todo {
 	margin:10px;
 }
+
+input[type=checkbox].select-all {
+	margin:0 0 0 0.5rem;
+}

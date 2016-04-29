@@ -8,11 +8,13 @@ class StateStore{
 		this.state = [
 		{
 			task: 'make Todo App',
-			isCompleted : true
+			isCompleted : true,
+			isSelected: false
 		},
 		{
 			task: 'Learn Alt.js',
-			isCompletd : false
+			isCompletd : false,
+			isSelected: true
 		}
 		];
 		this.bindActions(todoActions);
@@ -21,7 +23,8 @@ class StateStore{
 	onCreateTodo(task) {
 		this.state.push({
 			task,
-			isCompleted: false			
+			isCompleted: false,
+			isSelected: false			
 		});
 		this.setState(this.state);
 	}
@@ -59,6 +62,32 @@ class StateStore{
 
 	onClearAll() {
 		this.state = [];
+		this.setState(this.state);
+	}
+
+	onToggleSelected(task) {
+		const tobeChanged = _.find(this.state , (todo) => {
+			return todo.task === task;
+		});
+		tobeChanged.isSelected = !tobeChanged.isSelected;
+		this.setState(this.state);
+	}
+
+	onMarkCompleted() {
+		_.forEach(this.state,(todo) => {
+			if(todo.isSelected)
+			{
+				todo.isCompleted = true;
+				todo.isSelected = false;
+			}
+		});
+		this.setState(this.state);
+	}
+
+	onSelectAll(val) {
+		_.forEach(this.state,(todo) => {
+			todo.isSelected = val;
+		});
 		this.setState(this.state);
 	}
 

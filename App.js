@@ -38,7 +38,7 @@ class TodoApp extends React.Component {
 				<CreateTodo  todos={this.state.todos} newTask={this.newTask}/>
 				<h3>My Tasks</h3>
 				<TodoList todos = {this.state.todos}/>
-				<h5>Click on the task to mark it completed</h5>
+				<h5>Click on the task to toggle completed</h5>
 			</div>
 		);
 	}	
@@ -115,6 +115,7 @@ class TodoList extends React.Component {
 		this.clearCompleted = this.clearCompleted.bind(this);
 		this.clearAll = this.clearAll.bind(this);
 		this.getVisibility = this.getVisibility.bind(this);
+		this.markCompleted = this.markCompleted.bind(this);
 	}
 
 	componentWillMount() {
@@ -159,6 +160,7 @@ class TodoList extends React.Component {
 			<button className="btn btn-primary btn-sm" onClick={this.handleVisibility} data-tab="SHOW_ACTIVE">Show Active</button>
 			<button className="btn btn-warning btn-sm" onClick={this.clearCompleted}>Clear Completed</button>
 			<button className="btn btn-danger btn-sm" onClick={this.clearAll}>Clear All</button>
+			<button className="btn btn-info btn-sm" onClick={this.markCompleted}>Mark Completed Selected</button>
 			<table className="table table-striped table-bordered table-hover table-condensed table-responsive">
 				<TodoHeading/>
 				<tbody>
@@ -181,18 +183,47 @@ class TodoList extends React.Component {
 	clearAll() {
 		todoActions.clearAll();
 	}
+
+	markCompleted() {
+		todoActions.markCompleted();
+	}
 }
 class TodoHeading extends React.Component {
+	constructor(){
+		super();
+		this.selectAll = this.selectAll.bind(this);
+		this.renderInput = this.renderInput.bind(this);
+		this.state = {
+			selectAll : false
+		};
+	}
+	renderInput(){
+		if(this.state.selectAll) {
+			return(
+				<input className="select-all" type="checkbox" onChange={this.selectAll} checked/>
+			);
+		} else {
+			return(
+				<input className="select-all" type="checkbox" onChange={this.selectAll}/>
+			);
+		}
+	}
 	render(){
 		return(
 				<thead>
 				<tr>
 					<th><strong>Task</strong></th>
 					<th><strong>Actions</strong></th>
-					<th><strong>Select</strong></th>
+					<th><strong>Select</strong>{this.renderInput()}</th>
 				</tr>
 				</thead>
 		);
+	}
+
+	selectAll(){
+		this.state.selectAll = !this.state.selectAll;
+		todoActions.selectAll(this.state.selectAll);
+		this.setState(this.state);
 	}	
 }
 class TodoListItem extends React.Component {
@@ -208,6 +239,7 @@ class TodoListItem extends React.Component {
 		this.onDeleteClick = this.onDeleteClick.bind(this);
 		this.onSaveClick = this.onSaveClick.bind(this);
 		this.onToggle = this.onToggle.bind(this);
+		this.onInputChange = this.onInputChange.bind(this);
 	}
 	renderActionSection(){
 		if(!this.state.isEditing)
@@ -227,7 +259,7 @@ class TodoListItem extends React.Component {
 			);
 	}
 	renderTaskSection(){
-		const {task , isCompleted} = this.props;
+		const {task , isCompleted } = this.props;
 		const taskStyle = {
 			color : isCompleted ? '#aaaaaa' : 'black',
 			cursor : 'pointer'
@@ -248,12 +280,28 @@ class TodoListItem extends React.Component {
 			</td>
 		);
 	}
+
+	renderCheckbox(){
+		if(this.props.isSelected) {
+			return ( 
+				<td>
+					<input type="checkbox" onChange={this.onInputChange} checked/>
+				</td>
+			);
+		} else {
+			return (
+				<td>
+					<input type="checkbox" onChange={this.onInputChange}/>
+				</td>
+			);
+		}
+	}
 	render(){
 		return(
 			<tr>
 				{this.renderTaskSection()}
 				{this.renderActionSection()}
-				<td><input type="checkbox" defaultChecked/></td>	
+				{this.renderCheckbox()}	
 			</tr>
 		)
 	}
@@ -274,6 +322,9 @@ class TodoListItem extends React.Component {
 	}
 	onToggle(task) {
 		todoActions.toggleTodo(this.props.task);
+	}
+	onInputChange() {
+		todoActions.toggleSelected(this.props.task);
 	}
 } 
 export default TodoApp;
